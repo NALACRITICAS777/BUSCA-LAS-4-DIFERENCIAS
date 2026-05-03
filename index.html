@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reto adivina el animal</title>
+
+<style>
+body {
+    font-family: system-ui, Arial;
+    background: #0f172a;
+    color: #e2e8f0;
+    margin: 0;
+    text-align: center;
+}
+
+.container {
+    margin-top: 10vh;
+}
+
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.sub {
+    color: #94a3b8;
+    margin-bottom: 25px;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+.options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.card {
+    background: #1e293b;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 12px;
+    width: 130px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    background: #334155;
+}
+
+.card img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.round {
+    margin-top: 15px;
+    color: #94a3b8;
+}
+
+/* 🔥 contador esquina */
+.counter {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+/* 🔥 mensaje correcto grande */
+#correct-overlay {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9997;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #22c55e;
+}
+
+/* screamer */
+#screamer {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+
+#screamer img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
+#flash {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: white;
+    opacity: 0;
+    z-index: 9998;
+}
+
+.shake {
+    animation: shake 0.05s infinite;
+}
+
+@keyframes shake {
+    0% {transform: translate(2px,2px);}
+    50% {transform: translate(-2px,-2px);}
+    100% {transform: translate(2px,2px);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="counter" id="counter">1/4</div>
+
+<div class="container">
+    <h1>Reto Auditivo</h1>
+    <p class="sub">Escucha el sonido e identifica el animal correcto</p>
+
+    <button onclick="playAudio()">🔊 Reproducir sonido</button>
+
+    <div class="options" id="options"></div>
+
+    <p class="round" id="round">Ronda 1 de 4</p>
+</div>
+
+<!-- 🔥 overlay correcto -->
+<div id="correct-overlay">✔ Correcto</div>
+
+<div id="flash"></div>
+
+<div id="screamer">
+    <img src="archivos/screamer.gif">
+    <audio id="boom">
+        <source src="archivos/nightmare.mp3" type="audio/mpeg">
+    </audio>
+</div>
+
+<script>
+let round = 0;
+
+const rounds = [
+    {
+        audio: "archivos/gato.mp3",
+        correct: "gato",
+        options: ["gato","perro","vaca"]
+    },
+    {
+        audio: "archivos/mono.mp3",
+        correct: "mono",
+        options: ["mono","gato","perro"]
+    },
+    {
+        audio: "archivos/ballena.mp3",
+        correct: "ballena",
+        options: ["ballena","mono","vaca"]
+    },
+    {
+        audio: "archivos/gaviota.mp3",
+        correct: "gaviota",
+        options: ["gaviota","gato","perro"]
+    }
+];
+
+function loadRound() {
+    document.getElementById("round").innerText = `Ronda ${round+1} de 4`;
+    document.getElementById("counter").innerText = `${round+1}/4`;
+
+    let container = document.getElementById("options");
+    container.innerHTML = "";
+
+    rounds[round].options.forEach(animal => {
+        let div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+            <img src="archivos/${animal}.png">
+            <p>${animal}</p>
+        `;
+
+        div.onclick = () => select(animal);
+        container.appendChild(div);
+    });
+}
+
+function playAudio() {
+    let audio = new Audio(rounds[round].audio);
+
+    if (round === 0) audio.volume = 0.15;
+    else if (round === 1) audio.volume = 0.3;
+    else if (round === 2) audio.volume = 0.5;
+    else audio.volume = 0.1;
+
+    audio.play();
+}
+
+function select(animal) {
+    if (animal === rounds[round].correct) {
+
+        // 🔥 mostrar overlay correcto
+        let overlay = document.getElementById("correct-overlay");
+        overlay.style.display = "flex";
+
+        setTimeout(() => {
+            overlay.style.display = "none";
+
+            if (round === rounds.length - 1) {
+                jumpscare();
+            } else {
+                round++;
+                loadRound();
+            }
+
+        }, 600); // tiempo de transición
+
+    } else {
+        alert("Incorrecto, intenta nuevamente");
+    }
+}
+
+function jumpscare() {
+    document.getElementById("flash").style.opacity = 1;
+
+    setTimeout(() => {
+        document.getElementById("flash").style.opacity = 0;
+    }, 100);
+
+    setTimeout(() => {
+        document.getElementById("screamer").style.display = "block";
+        document.body.classList.add("shake");
+
+        let audio = document.getElementById("boom");
+        audio.volume = 1;
+        audio.play();
+    }, 80);
+}
+
+loadRound();
+</script>
+
+</body>
+</html>
