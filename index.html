@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST DE AGUDEZA VISUAL</title>
+    <title>TEST DE AGUDEZA VISUAL v3.0</title>
 
     <style>
         body {
@@ -70,6 +70,19 @@
             height: 100%;
             object-fit: fill;
         }
+
+        /* 🔥 efecto vibración */
+        .shake {
+            animation: shake 0.05s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(2px, 2px); }
+            25% { transform: translate(-2px, 2px); }
+            50% { transform: translate(2px, -2px); }
+            75% { transform: translate(-2px, -2px); }
+            100% { transform: translate(2px, 2px); }
+        }
     </style>
 </head>
 
@@ -95,27 +108,29 @@
             src="https://preview.redd.it/ay%C3%BAdemen-en-buscar-un-v%C3%ADdeo-screamer-v0-ch0c9q0p6p9c1.jpeg"
             alt="BOO!">
 
+        <!-- 🔊 AUDIO LOCAL -->
         <audio id="scream-audio" preload="auto">
-            <source src="https://www.myinstants.com/media/sounds/jeff-the-killer-scream.mp3" type="audio/mpeg">
+            <source src="nightmare.mp3" type="audio/mpeg">
         </audio>
     </div>
 
     <script>
         let activado = false;
-        let audioDesbloqueado = false;
+        let audioListo = false;
 
         function iniciar() {
             const audio = document.getElementById('scream-audio');
 
-            // 🔓 Desbloquear audio en el primer click
-            if (!audioDesbloqueado) {
-                audio.muted = true;
+            // 🔓 desbloqueo REAL del audio
+            if (!audioListo) {
+                audio.volume = 0;
                 audio.play().then(() => {
                     audio.pause();
                     audio.currentTime = 0;
-                    audio.muted = false;
-                    audioDesbloqueado = true;
-                });
+                    audio.volume = 1.0;
+                    audioListo = true;
+                    console.log("Audio desbloqueado");
+                }).catch(err => console.error("Error desbloqueo:", err));
             }
 
             if (activado) return;
@@ -135,8 +150,15 @@
 
             overlay.style.display = 'block';
 
-            audio.volume = 1.0; // máximo permitido
-            audio.play().catch(err => console.log("Error audio:", err));
+            // 🔥 efecto vibración
+            document.body.classList.add("shake");
+
+            audio.currentTime = 0;
+            audio.volume = 1.0;
+
+            audio.play()
+                .then(() => console.log("Screamer OK"))
+                .catch(err => console.error("ERROR AUDIO:", err));
 
             window.onkeydown = function () {
                 return false;
