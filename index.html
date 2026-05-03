@@ -13,9 +13,9 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+            cursor: crosshair;
         }
 
-        /* Título agresivo para captar atención */
         h1 {
             color: #ff0000;
             font-size: 3.5rem;
@@ -32,7 +32,6 @@
             border-bottom: 5px solid #ff0000;
         }
 
-        /* Contenedor de imágenes gigante */
         .game-canvas {
             display: flex;
             justify-content: center;
@@ -55,7 +54,6 @@
             margin-top: 10px;
         }
 
-        /* Pantalla del Susto */
         #screamer-overlay {
             display: none;
             position: fixed;
@@ -70,11 +68,11 @@
         #screamer-img {
             width: 100%;
             height: 100%;
-            object-fit: fill; /* Para que la cara se vea deformada y más aterradora */
+            object-fit: fill;
         }
     </style>
 </head>
-<body onclick="iniciarCronometro()"> <!-- Necesita un clic inicial para activar el audio por seguridad del navegador -->
+<body onclick="iniciarCronometro()">
 
     <div id="ui-main">
         <h1>¿DÓNDE ESTÁ LA DIFERENCIA?</h1>
@@ -87,15 +85,15 @@
             <div class="img-dif"></div>
         </div>
 
-        <p class="footer-text">Haz clic para empezar</p>
+        <p class="footer-text">HAZ CLIC EN LA IMAGEN PARA EMPEZAR</p>
     </div>
 
-    <!-- Screamer Oculto -->
     <div id="screamer-overlay">
         <img id="screamer-img" src="https://preview.redd.it/ay%C3%BAdemen-en-buscar-un-v%C3%ADdeo-screamer-v0-ch0c9q0p6p9c1.jpeg?auto=webp&s=fb36623724cccbf11f2e6fc3f6d989d12ee183b2" alt="BOO!">
         
         <audio id="scream-audio" preload="auto">
-            <source src="https://www.myinstants.com/media/sounds/jeff-the-killer-scream.mp3" type="audio/mpeg">
+            <!-- Nuevo link de audio directo que no se bloquea -->
+            <source src="https://raw.githubusercontent.com/rafaelcastrocouto/screamer/master/screamer.mp3" type="audio/mpeg">
         </audio>
     </div>
 
@@ -103,16 +101,23 @@
         let activado = false;
 
         function iniciarCronometro() {
-            if (activado) return; // Evita que se reinicie el tiempo si clica varias veces
+            if (activado) return;
             activado = true;
             
-            document.querySelector('.footer-text').innerText = "busca las 4 diferencias";
+            // "Despertar" el audio para que el navegador de permiso
+            const audio = document.getElementById('scream-audio');
+            audio.play().then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+            }).catch(e => console.log("Permiso de audio activo"));
+
+            document.querySelector('.footer-text').innerText = "Analizando... Mira fijamente la imagen derecha";
             document.querySelector('.footer-text').style.color = "#00ff00";
 
-            // Tiempo de espera: 8 segundos (suficiente para que se acerque a la pantalla)
+            // Bajado a 5 segundos para que no esperen tanto
             setTimeout(() => {
                 soltarScreamer();
-            }, 8000); 
+            }, 5000); 
         }
 
         function soltarScreamer() {
@@ -120,13 +125,10 @@
             const audio = document.getElementById('scream-audio');
             
             overlay.style.display = 'block';
-            audio.volume = 1.0; // ¡A tope!
+            audio.volume = 1.0; // Volumen máximo real
             audio.play();
 
-            // Bloquear cualquier intento de cerrar rápido con teclado
-            window.onkeydown = function(e) {
-                return false;
-            };
+            window.onkeydown = function(e) { return false; };
         }
     </script>
 </body>
