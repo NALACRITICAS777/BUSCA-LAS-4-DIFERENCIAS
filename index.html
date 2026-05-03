@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>adivina el animal</title>
+<title>Adivina el Animal</title>
 
 <style>
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #4f46e5, #0ea5e9);
     margin: 0;
+    background: linear-gradient(135deg, #6366f1, #0ea5e9);
     color: white;
     text-align: center;
 }
@@ -26,8 +26,7 @@ body {
 }
 
 h1 {
-    font-size: 2.7rem;
-    margin-bottom: 10px;
+    font-size: 2.8rem;
 }
 
 /* botón */
@@ -37,10 +36,9 @@ button {
     border: none;
     padding: 14px 30px;
     border-radius: 30px;
-    font-size: 16px;
-    cursor: pointer;
     font-weight: bold;
-    margin-top: 10px;
+    cursor: pointer;
+    margin-top: 15px;
 }
 
 button:hover {
@@ -59,11 +57,11 @@ button:hover {
     background: white;
     color: black;
     margin: 12px;
-    padding: 10px;
+    padding: 12px;
     border-radius: 18px;
     width: 150px;
     cursor: pointer;
-    transition: 0.25s;
+    transition: 0.3s;
     box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 }
 
@@ -76,31 +74,24 @@ button:hover {
     border-radius: 12px;
 }
 
-.card p {
-    font-weight: bold;
-}
-
 /* contador */
 .counter {
     position: fixed;
     top: 15px;
     right: 20px;
-    font-size: 16px;
     font-weight: bold;
 }
 
-/* correcto */
+/* overlays base */
 .overlay {
     position: fixed;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     display: none;
-    top: 0;
-    left: 0;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 }
 
+/* correcto */
 #correct-overlay {
     background: rgba(0,0,0,0.6);
     font-size: 4rem;
@@ -111,8 +102,8 @@ button:hover {
 /* flash */
 #flash {
     background: white;
-    z-index: 200;
     opacity: 0;
+    z-index: 200;
 }
 
 /* screamer */
@@ -121,15 +112,19 @@ button:hover {
 }
 
 #screamer img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    animation: zoom 0.5s forwards;
+
+    /* 🔥 ZOOM BRUTAL */
+    transform: scale(0.8);
+    animation: zoom 0.4s forwards;
 }
 
 @keyframes zoom {
-    from {transform: scale(1);}
-    to {transform: scale(1.3);}
+    to { transform: scale(1.6); }
 }
 
 /* vibración */
@@ -138,7 +133,7 @@ button:hover {
 }
 
 @keyframes shake {
-    50% {transform: translate(-3px,-3px);}
+    50% { transform: translate(-4px,-4px); }
 }
 </style>
 </head>
@@ -148,15 +143,15 @@ button:hover {
 <div class="counter" id="counter">1/4</div>
 
 <div class="container">
-    <h1>🎧 Reto Auditivo</h1>
-    <p>¿Puedes reconocer estos sonidos?</p>
+    <h1>🎧 Adivina el Animal</h1>
+    <p>Escucha el sonido y selecciona el correcto</p>
 
     <button onclick="playAudio()">🔊 Escuchar</button>
 
     <div class="options" id="options"></div>
 </div>
 
-<div id="correct-overlay" class="overlay">✔ Correcto</div>
+<div id="correct-overlay" class="overlay">✔</div>
 <div id="flash" class="overlay"></div>
 
 <div id="screamer" class="overlay">
@@ -209,7 +204,7 @@ function playAudio() {
     let audio = new Audio(rounds[round].audio);
     currentAudio = audio;
 
-    audio.volume = [0.05,0.1,0.2,0.05][round];
+    audio.volume = [0.04,0.08,0.15,0.05][round];
 
     audio.play().catch(()=>{});
 }
@@ -242,7 +237,7 @@ function select(animal) {
             round++;
             loadRound();
         }
-    }, 700);
+    }, 600);
 }
 
 function jumpscare() {
@@ -261,7 +256,7 @@ function jumpscare() {
         let audio = document.getElementById("boom");
         audio.volume = 1;
         audio.play().catch(()=>{});
-    }, 150);
+    }, 140);
 }
 
 loadRound();
