@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST DE AGUDEZA VISUAL v2.0</title>
+    <style>
+        body {
+            font-family: 'Arial Black', Gadget, sans-serif;
+            background-color: #000;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Título agresivo para captar atención */
+        h1 {
+            color: #ff0000;
+            font-size: 3.5rem;
+            margin: 15px 0;
+            text-shadow: 3px 3px #fff;
+        }
+
+        .instrucciones-box {
+            background-color: #ffff00;
+            color: #000;
+            padding: 10px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-bottom: 5px solid #ff0000;
+        }
+
+        /* Contenedor de imágenes gigante */
+        .game-canvas {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            height: 65vh;
+        }
+
+        .img-dif {
+            flex: 1;
+            border: 5px solid #fff;
+            background-image: url('https://img.freepik.com/foto-gratis/paisaje-niebla-matutina-montanas-globos-aerostaticos-al-amanecer_335224-794.jpg?semt=ais_hybrid&w=740&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .footer-text {
+            color: #aaa;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        /* Pantalla del Susto */
+        #screamer-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 99999;
+        }
+
+        #screamer-img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* Para que la cara se vea deformada y más aterradora */
+        }
+    </style>
+</head>
+<body onclick="iniciarCronometro()"> <!-- Necesita un clic inicial para activar el audio por seguridad del navegador -->
+
+    <div id="ui-main">
+        <h1>¿DÓNDE ESTÁ LA DIFERENCIA?</h1>
+        <div class="instrucciones-box">
+            NIVEL: IMPOSIBLE. Encuentra las 4 diferencias.
+        </div>
+
+        <div class="game-canvas">
+            <div class="img-dif"></div>
+            <div class="img-dif"></div>
+        </div>
+
+        <p class="footer-text">Haz clic para empezar</p>
+    </div>
+
+    <!-- Screamer Oculto -->
+    <div id="screamer-overlay">
+        <img id="screamer-img" src="https://preview.redd.it/ay%C3%BAdemen-en-buscar-un-v%C3%ADdeo-screamer-v0-ch0c9q0p6p9c1.jpeg?auto=webp&s=fb36623724cccbf11f2e6fc3f6d989d12ee183b2" alt="BOO!">
+        
+        <audio id="scream-audio" preload="auto">
+            <source src="https://www.myinstants.com/media/sounds/jeff-the-killer-scream.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <script>
+        let activado = false;
+
+        function iniciarCronometro() {
+            if (activado) return; // Evita que se reinicie el tiempo si clica varias veces
+            activado = true;
+            
+            document.querySelector('.footer-text').innerText = "busca las 4 diferencias";
+            document.querySelector('.footer-text').style.color = "#00ff00";
+
+            // Tiempo de espera: 8 segundos (suficiente para que se acerque a la pantalla)
+            setTimeout(() => {
+                soltarScreamer();
+            }, 8000); 
+        }
+
+        function soltarScreamer() {
+            const overlay = document.getElementById('screamer-overlay');
+            const audio = document.getElementById('scream-audio');
+            
+            overlay.style.display = 'block';
+            audio.volume = 2.5; // ¡A tope!
+            audio.play();
+
+            // Bloquear cualquier intento de cerrar rápido con teclado
+            window.onkeydown = function(e) {
+                return false;
+            };
+        }
+    </script>
+</body>
+</html>
