@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST DE AGUDEZA VISUAL v2.0</title>
+    <title>TEST DE AGUDEZA VISUAL</title>
+
     <style>
         body {
             font-family: 'Arial Black', Gadget, sans-serif;
@@ -13,7 +14,6 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            cursor: crosshair;
         }
 
         h1 {
@@ -43,7 +43,7 @@
         .img-dif {
             flex: 1;
             border: 5px solid #fff;
-            background-image: url('https://img.freepik.com/foto-gratis/paisaje-niebla-matutina-montanas-globos-aerostaticos-al-amanecer_335224-794.jpg?semt=ais_hybrid&w=740&q=80');
+            background-image: url('https://img.freepik.com/foto-gratis/paisaje-niebla-matutina-montanas-globos-aerostaticos-al-amanecer_335224-794.jpg');
             background-size: cover;
             background-position: center;
         }
@@ -72,10 +72,12 @@
         }
     </style>
 </head>
-<body onclick="iniciarCronometro()">
+
+<body onclick="iniciar()">
 
     <div id="ui-main">
         <h1>¿DÓNDE ESTÁ LA DIFERENCIA?</h1>
+
         <div class="instrucciones-box">
             NIVEL: IMPOSIBLE. Encuentra las 4 diferencias.
         </div>
@@ -85,51 +87,62 @@
             <div class="img-dif"></div>
         </div>
 
-        <p class="footer-text">HAZ CLIC EN LA IMAGEN PARA EMPEZAR</p>
+        <p class="footer-text">Haz clic para empezar</p>
     </div>
 
     <div id="screamer-overlay">
-        <img id="screamer-img" src="https://preview.redd.it/ay%C3%BAdemen-en-buscar-un-v%C3%ADdeo-screamer-v0-ch0c9q0p6p9c1.jpeg?auto=webp&s=fb36623724cccbf11f2e6fc3f6d989d12ee183b2" alt="BOO!">
-        
+        <img id="screamer-img"
+            src="https://preview.redd.it/ay%C3%BAdemen-en-buscar-un-v%C3%ADdeo-screamer-v0-ch0c9q0p6p9c1.jpeg"
+            alt="BOO!">
+
         <audio id="scream-audio" preload="auto">
-            <!-- Nuevo link de audio directo que no se bloquea -->
-            <source src="https://raw.githubusercontent.com/rafaelcastrocouto/screamer/master/screamer.mp3" type="audio/mpeg">
+            <source src="https://www.myinstants.com/media/sounds/jeff-the-killer-scream.mp3" type="audio/mpeg">
         </audio>
     </div>
 
     <script>
         let activado = false;
+        let audioDesbloqueado = false;
 
-        function iniciarCronometro() {
+        function iniciar() {
+            const audio = document.getElementById('scream-audio');
+
+            // 🔓 Desbloquear audio en el primer click
+            if (!audioDesbloqueado) {
+                audio.muted = true;
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.muted = false;
+                    audioDesbloqueado = true;
+                });
+            }
+
             if (activado) return;
             activado = true;
-            
-            // "Despertar" el audio para que el navegador de permiso
-            const audio = document.getElementById('scream-audio');
-            audio.play().then(() => {
-                audio.pause();
-                audio.currentTime = 0;
-            }).catch(e => console.log("Permiso de audio activo"));
 
-            document.querySelector('.footer-text').innerText = "Analizando... Mira fijamente la imagen derecha";
+            document.querySelector('.footer-text').innerText = "busca las 4 diferencias";
             document.querySelector('.footer-text').style.color = "#00ff00";
 
-            // Bajado a 5 segundos para que no esperen tanto
             setTimeout(() => {
                 soltarScreamer();
-            }, 5000); 
+            }, 8000);
         }
 
         function soltarScreamer() {
             const overlay = document.getElementById('screamer-overlay');
             const audio = document.getElementById('scream-audio');
-            
-            overlay.style.display = 'block';
-            audio.volume = 1.0; // Volumen máximo real
-            audio.play();
 
-            window.onkeydown = function(e) { return false; };
+            overlay.style.display = 'block';
+
+            audio.volume = 1.0; // máximo permitido
+            audio.play().catch(err => console.log("Error audio:", err));
+
+            window.onkeydown = function () {
+                return false;
+            };
         }
     </script>
+
 </body>
 </html>
