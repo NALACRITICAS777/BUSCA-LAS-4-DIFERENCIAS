@@ -7,44 +7,37 @@
 
 <style>
 body {
-    font-family: system-ui, Arial;
+    font-family: system-ui;
     background: linear-gradient(135deg, #1e293b, #0f172a);
     color: #e2e8f0;
     margin: 0;
     text-align: center;
 }
 
-/* contenedor */
+/* fade entrada */
 .container {
     margin-top: 8vh;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.8s ease forwards;
 }
 
-/* título */
-h1 {
-    font-size: 2.5rem;
-    margin-bottom: 5px;
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.sub {
-    color: #cbd5f5;
-    margin-bottom: 25px;
-}
+h1 { font-size: 2.5rem; }
+.sub { color: #cbd5f5; }
 
-/* botón */
 button {
     background: #22c55e;
-    color: black;
     border: none;
     padding: 14px 28px;
     border-radius: 30px;
-    font-size: 16px;
     cursor: pointer;
-    font-weight: bold;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-}
-
-button:hover {
-    background: #16a34a;
 }
 
 /* opciones */
@@ -52,7 +45,6 @@ button:hover {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin-top: 30px;
 }
 
 .card {
@@ -63,22 +55,14 @@ button:hover {
     width: 140px;
     cursor: pointer;
     transition: 0.25s;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.4);
 }
 
 .card:hover {
     transform: scale(1.08);
-    background: #334155;
 }
 
 .card img {
     width: 100%;
-    border-radius: 10px;
-}
-
-.card p {
-    margin-top: 8px;
-    font-weight: bold;
 }
 
 /* contador */
@@ -86,22 +70,19 @@ button:hover {
     position: fixed;
     top: 15px;
     right: 20px;
-    font-size: 14px;
-    color: #cbd5f5;
 }
 
-/* correcto */
+/* correcto overlay */
 #correct-overlay {
     display: none;
     position: fixed;
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.6);
-    z-index: 9997;
+    z-index: 5;
     align-items: center;
     justify-content: center;
-    font-size: 3.5rem;
-    font-weight: bold;
+    font-size: 3rem;
     color: #4ade80;
 }
 
@@ -111,13 +92,13 @@ button:hover {
     position: fixed;
     width: 100%;
     height: 100%;
-    z-index: 9999;
+    z-index: 10;
 }
 
 #screamer img {
     width: 100%;
     height: 100%;
-    object-fit: fill;
+    object-fit: cover;
 }
 
 /* flash */
@@ -127,18 +108,15 @@ button:hover {
     height: 100%;
     background: white;
     opacity: 0;
-    z-index: 9998;
+    z-index: 9;
 }
 
-/* vibración */
 .shake {
     animation: shake 0.05s infinite;
 }
 
 @keyframes shake {
-    0% {transform: translate(2px,2px);}
     50% {transform: translate(-2px,-2px);}
-    100% {transform: translate(2px,2px);}
 }
 </style>
 </head>
@@ -149,9 +127,9 @@ button:hover {
 
 <div class="container">
     <h1>🎧 Reto Auditivo</h1>
-    <p class="sub">Escucha el sonido y selecciona el animal correcto</p>
+    <p class="sub">Escucha y elige el animal</p>
 
-    <button onclick="playAudio()">▶ Reproducir sonido</button>
+    <button onclick="playAudio()">▶ Reproducir</button>
 
     <div class="options" id="options"></div>
 </div>
@@ -162,38 +140,23 @@ button:hover {
 
 <div id="screamer">
     <img src="archivos/screamer.gif">
-    <audio id="boom">
-        <source src="archivos/nightmare.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="boom" src="archivos/nightmare.mp3"></audio>
 </div>
 
 <script>
 let round = 0;
+let currentAudio = null;
 
 const rounds = [
-    {
-        audio: "archivos/gato.mp3",
-        correct: "gato",
-        options: ["gato","perro","vaca"]
-    },
-    {
-        audio: "archivos/rana.mp3",
-        correct: "rana",
-        options: ["rana","gato","perro"]
-    },
-    {
-        audio: "archivos/ballena.mp3",
-        correct: "ballena",
-        options: ["ballena","vaca","rana"]
-    },
-    {
-        audio: "archivos/gaviota.mp3",
-        correct: "gaviota",
-        options: ["gaviota","gato","perro"]
-    }
+    {audio:"archivos/gato.mp3", correct:"gato", options:["gato","perro","vaca"]},
+    {audio:"archivos/rana.mp3", correct:"rana", options:["rana","gato","perro"]},
+    {audio:"archivos/ballena.mp3", correct:"ballena", options:["ballena","vaca","rana"]},
+    {audio:"archivos/gaviota.mp3", correct:"gaviota", options:["gaviota","gato","perro"]}
 ];
 
 function loadRound() {
+    stopAudio();
+
     document.getElementById("counter").innerText = `${round+1}/4`;
 
     let container = document.getElementById("options");
@@ -202,67 +165,70 @@ function loadRound() {
     rounds[round].options.forEach(animal => {
         let div = document.createElement("div");
         div.className = "card";
-
-        div.innerHTML = `
-            <img src="archivos/${animal}.png">
-            <p>${animal}</p>
-        `;
-
+        div.innerHTML = `<img src="archivos/${animal}.png"><p>${animal}</p>`;
         div.onclick = () => select(animal);
         container.appendChild(div);
     });
 }
 
 function playAudio() {
+    stopAudio();
+
     let audio = new Audio(rounds[round].audio);
+    currentAudio = audio;
 
-    // 🔊 volumen MÁS bajo
-    if (round === 0) audio.volume = 0.08;
-    else if (round === 1) audio.volume = 0.15;
-    else if (round === 2) audio.volume = 0.25;
-    else audio.volume = 0.08;
+    // volumen bajo
+    audio.volume = [0.08,0.15,0.25,0.08][round];
 
-    audio.play();
+    audio.play().catch(()=>{});
+}
+
+function stopAudio() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+    }
 }
 
 function select(animal) {
-    if (animal === rounds[round].correct) {
-
-        let overlay = document.getElementById("correct-overlay");
-        overlay.style.display = "flex";
-
-        setTimeout(() => {
-            overlay.style.display = "none";
-
-            if (round === rounds.length - 1) {
-                jumpscare();
-            } else {
-                round++;
-                loadRound();
-            }
-
-        }, 600);
-
-    } else {
-        alert("Incorrecto, intenta nuevamente");
+    if (animal !== rounds[round].correct) {
+        alert("Incorrecto");
+        return;
     }
+
+    stopAudio();
+
+    let overlay = document.getElementById("correct-overlay");
+    overlay.style.display = "flex";
+
+    setTimeout(() => {
+        overlay.style.display = "none";
+
+        if (round === rounds.length - 1) {
+            jumpscare();
+        } else {
+            round++;
+            loadRound();
+        }
+    }, 600);
 }
 
 function jumpscare() {
     document.getElementById("flash").style.opacity = 1;
 
-    setTimeout(() => {
+    setTimeout(()=>{
         document.getElementById("flash").style.opacity = 0;
-    }, 100);
+    },100);
 
-    setTimeout(() => {
+    setTimeout(()=>{
         document.getElementById("screamer").style.display = "block";
         document.body.classList.add("shake");
 
         let audio = document.getElementById("boom");
         audio.volume = 1;
-        audio.play();
-    }, 80);
+        audio.play().catch(()=>{});
+    },80);
 }
 
 loadRound();
