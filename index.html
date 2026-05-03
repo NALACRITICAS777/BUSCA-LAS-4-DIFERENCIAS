@@ -3,45 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reto adivina el animal</title>
+<title>Reto Auditivo</title>
 
 <style>
 body {
     font-family: system-ui, Arial;
-    background: #0f172a;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
     color: #e2e8f0;
     margin: 0;
     text-align: center;
 }
 
+/* contenedor */
 .container {
-    margin-top: 10vh;
+    margin-top: 8vh;
 }
 
+/* título */
 h1 {
-    font-size: 2.2rem;
-    margin-bottom: 10px;
+    font-size: 2.5rem;
+    margin-bottom: 5px;
 }
 
 .sub {
-    color: #94a3b8;
+    color: #cbd5f5;
     margin-bottom: 25px;
 }
 
+/* botón */
 button {
-    background: #2563eb;
-    color: white;
+    background: #22c55e;
+    color: black;
     border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
+    padding: 14px 28px;
+    border-radius: 30px;
     font-size: 16px;
     cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
 
 button:hover {
-    background: #1d4ed8;
+    background: #16a34a;
 }
 
+/* opciones */
 .options {
     display: flex;
     justify-content: center;
@@ -52,52 +58,51 @@ button:hover {
 .card {
     background: #1e293b;
     margin: 10px;
-    padding: 15px;
-    border-radius: 12px;
-    width: 130px;
+    padding: 10px;
+    border-radius: 16px;
+    width: 140px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: 0.25s;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.4);
 }
 
 .card:hover {
-    transform: scale(1.05);
+    transform: scale(1.08);
     background: #334155;
 }
 
 .card img {
     width: 100%;
-    border-radius: 8px;
+    border-radius: 10px;
 }
 
-.round {
-    margin-top: 15px;
-    color: #94a3b8;
+.card p {
+    margin-top: 8px;
+    font-weight: bold;
 }
 
-/* 🔥 contador esquina */
+/* contador */
 .counter {
     position: fixed;
     top: 15px;
     right: 20px;
     font-size: 14px;
-    color: #94a3b8;
+    color: #cbd5f5;
 }
 
-/* 🔥 mensaje correcto grande */
+/* correcto */
 #correct-overlay {
     display: none;
     position: fixed;
     width: 100%;
     height: 100%;
-    top: 0;
-    left: 0;
     background: rgba(0,0,0,0.6);
     z-index: 9997;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: bold;
-    color: #22c55e;
+    color: #4ade80;
 }
 
 /* screamer */
@@ -106,8 +111,6 @@ button:hover {
     position: fixed;
     width: 100%;
     height: 100%;
-    top: 0;
-    left: 0;
     z-index: 9999;
 }
 
@@ -117,6 +120,7 @@ button:hover {
     object-fit: fill;
 }
 
+/* flash */
 #flash {
     position: fixed;
     width: 100%;
@@ -126,6 +130,7 @@ button:hover {
     z-index: 9998;
 }
 
+/* vibración */
 .shake {
     animation: shake 0.05s infinite;
 }
@@ -143,17 +148,14 @@ button:hover {
 <div class="counter" id="counter">1/4</div>
 
 <div class="container">
-    <h1>Reto Auditivo</h1>
-    <p class="sub">Escucha el sonido e identifica el animal correcto</p>
+    <h1>🎧 Reto Auditivo</h1>
+    <p class="sub">Escucha el sonido y selecciona el animal correcto</p>
 
-    <button onclick="playAudio()">🔊 Reproducir sonido</button>
+    <button onclick="playAudio()">▶ Reproducir sonido</button>
 
     <div class="options" id="options"></div>
-
-    <p class="round" id="round">Ronda 1 de 4</p>
 </div>
 
-<!-- 🔥 overlay correcto -->
 <div id="correct-overlay">✔ Correcto</div>
 
 <div id="flash"></div>
@@ -175,14 +177,14 @@ const rounds = [
         options: ["gato","perro","vaca"]
     },
     {
-        audio: "archivos/mono.mp3",
-        correct: "mono",
-        options: ["mono","gato","perro"]
+        audio: "archivos/rana.mp3",
+        correct: "rana",
+        options: ["rana","gato","perro"]
     },
     {
         audio: "archivos/ballena.mp3",
         correct: "ballena",
-        options: ["ballena","mono","vaca"]
+        options: ["ballena","vaca","rana"]
     },
     {
         audio: "archivos/gaviota.mp3",
@@ -192,7 +194,6 @@ const rounds = [
 ];
 
 function loadRound() {
-    document.getElementById("round").innerText = `Ronda ${round+1} de 4`;
     document.getElementById("counter").innerText = `${round+1}/4`;
 
     let container = document.getElementById("options");
@@ -215,10 +216,11 @@ function loadRound() {
 function playAudio() {
     let audio = new Audio(rounds[round].audio);
 
-    if (round === 0) audio.volume = 0.15;
-    else if (round === 1) audio.volume = 0.3;
-    else if (round === 2) audio.volume = 0.5;
-    else audio.volume = 0.1;
+    // 🔊 volumen MÁS bajo
+    if (round === 0) audio.volume = 0.08;
+    else if (round === 1) audio.volume = 0.15;
+    else if (round === 2) audio.volume = 0.25;
+    else audio.volume = 0.08;
 
     audio.play();
 }
@@ -226,7 +228,6 @@ function playAudio() {
 function select(animal) {
     if (animal === rounds[round].correct) {
 
-        // 🔥 mostrar overlay correcto
         let overlay = document.getElementById("correct-overlay");
         overlay.style.display = "flex";
 
@@ -240,7 +241,7 @@ function select(animal) {
                 loadRound();
             }
 
-        }, 600); // tiempo de transición
+        }, 600);
 
     } else {
         alert("Incorrecto, intenta nuevamente");
